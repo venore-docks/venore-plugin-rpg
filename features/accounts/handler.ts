@@ -1,7 +1,7 @@
 import type { OperationResult } from "@venore/plugin-sdk";
 import { authorizeActor } from "@venore/plugin-sdk/rbac";
 import { isValidVersion } from "../../shared/version";
-import { createCharacter, listAccounts, login, registerAccount, setAccountBanned } from "./service";
+import { createCharacter, listAccounts, listMyCharacters, login, registerAccount, setAccountBanned } from "./service";
 import { validateAccountName, validateCharacterName, validatePassword } from "./validation";
 import type { AccountAdminView, CharacterSummary, LoginResponse } from "../../contracts/types";
 
@@ -34,6 +34,14 @@ export async function createCharacterHandler(input: { token: string | null; name
   const error = validateCharacterName(input.name);
   if (error) return { success: false, error };
   return createCharacter({ token: input.token, name: input.name });
+}
+
+/** App autenticado pelo token de sessão. */
+export async function listMyCharactersHandler(input: {
+  token: string | null;
+}): Promise<OperationResult<{ account: { id: number; name: string }; characters: CharacterSummary[] }>> {
+  if (!input.token) return { success: false, error: { code: "rpg.invalid_session", message: "Entre na sua conta primeiro." } };
+  return listMyCharacters({ token: input.token });
 }
 
 export async function listAccountsHandler(): Promise<OperationResult<AccountAdminView[]>> {

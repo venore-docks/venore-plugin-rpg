@@ -12,17 +12,23 @@ import {
   TableHeader,
   TableRow,
 } from "@venore/plugin-sdk/ui";
-import { getServerConfig, listContentEntries, listContentVersions } from "../../index";
+import { getGameServerStatus, getServerConfig, listContentEntries, listContentVersions } from "../../index";
 import { RpgAdminNav } from "./admin-nav";
+import { GameServerCard } from "./game-server-card";
 import { PublishForm, ServerConfigForm } from "./server-forms";
 
 export default async function RpgAdminHomePage() {
   const gate = await getPluginAdminPageData("rpg");
   if (!gate.granted) return <AdminAccessDenied message="Você não tem permissão para administrar o RPG." />;
 
-  const [config, entries, versions] = await Promise.all([getServerConfig(), listContentEntries(), listContentVersions()]);
-  if (!config.success || !entries.success || !versions.success) {
-    const error = [config, entries, versions].find((r) => !r.success);
+  const [config, entries, versions, game] = await Promise.all([
+    getServerConfig(),
+    listContentEntries(),
+    listContentVersions(),
+    getGameServerStatus(),
+  ]);
+  if (!config.success || !entries.success || !versions.success || !game.success) {
+    const error = [config, entries, versions, game].find((r) => !r.success);
     return (
       <div className="space-y-6">
         <AdminPageHeader title="RPG" description="Servidor do MMORPG Venore." />
@@ -50,6 +56,8 @@ export default async function RpgAdminHomePage() {
         <AdminStatTile label="Monstros" value={count("monster")} />
         <AdminStatTile label="NPCs" value={count("npc")} />
       </div>
+
+      <GameServerCard status={game.data} fixedUrl={config.data.gameServerUrl} />
 
       <Card>
         <CardContent className="space-y-3">

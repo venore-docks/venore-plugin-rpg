@@ -13,6 +13,10 @@ export {
 export { getServerConfigHandler as getServerConfig, updateServerConfigHandler as updateServerConfig } from "./features/config/handler";
 export { getPublicStatusHandler as getPublicStatus } from "./features/status/handler";
 export {
+  rotateServerKeyHandler as rotateServerKey,
+  getGameServerStatusHandler as getGameServerStatus,
+} from "./features/server/handler";
+export {
   registerAccountHandler as registerAccount,
   loginHandler as login,
   createCharacterHandler as createCharacter,
@@ -28,6 +32,8 @@ export type {
   ContentPack,
   ContentVersionSummary,
   GameRules,
+  GameServerStatus,
+  GameSession,
   LoginResponse,
   ServerConfig,
 } from "./contracts/types";

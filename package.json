@@ -1,6 +1,6 @@
 {
   "name": "@venore/plugin-rpg",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Servidor de conteúdo e contas do MMORPG Venore: itens, monstros, NPCs e regras editáveis no admin, publicação versionada, contas/login e API para o app.",
   "private": true,
   "type": "module",

@@ -2,12 +2,12 @@
 // Servida pelo dispatcher do core em /api/rpg/<pattern>. O app não é navegador, então não há CORS.
 import { NextResponse } from "next/server";
 import { isPluginActive } from "@venore/plugin-sdk";
-import { createCharacterHandler, loginHandler, registerAccountHandler } from "../../features/accounts/handler";
+import { createCharacterHandler, listMyCharactersHandler, loginHandler, registerAccountHandler } from "../../features/accounts/handler";
 import { getPublishedContentHandler } from "../../features/content/handler";
 import { getPublicStatusHandler } from "../../features/status/handler";
 import { apiError, apiFromError, apiOk, bearerToken, readJsonBody } from "../../shared/http";
 
-async function inactive() {
+export async function inactive() {
   return (await isPluginActive("rpg")) ? null : apiError(503, "offline", "Servidor em manutenção.");
 }
 
@@ -65,4 +65,11 @@ export async function charactersPOST(request: Request) {
   if (!body) return apiError(400, "bad_request", "Requisição inválida.");
   const result = await createCharacterHandler({ token: bearerToken(request), name: String(body.name ?? "") });
   return result.success ? apiOk({ character: result.data }, { status: 201 }) : apiFromError(result.error);
+}
+
+export async function charactersGET(request: Request) {
+  const off = await inactive();
+  if (off) return off;
+  const result = await listMyCharactersHandler({ token: bearerToken(request) });
+  return result.success ? apiOk(result.data) : apiFromError(result.error);
 }

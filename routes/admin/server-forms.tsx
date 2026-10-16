@@ -1,16 +1,18 @@
 "use client";
 
 import { useActionState } from "react";
-import { Ban, Rocket, ShieldCheck } from "lucide-react";
+import { Ban, KeyRound, Rocket, ShieldCheck } from "lucide-react";
 import { Button, Input, Textarea, useActionToast } from "@venore/plugin-sdk/ui";
 import { RULE_LIMITS } from "../../shared/config";
 import type { GameRules, ServerConfig } from "../../contracts/types";
 import {
   publishAction,
+  rotateServerKeyAction,
   setBannedAction,
   updateConfigAction,
   type PublishActionState,
   type RpgActionState,
+  type ServerKeyActionState,
 } from "./actions";
 
 const fieldClass = "flex flex-col gap-1 text-sm text-muted-foreground";
@@ -27,8 +29,8 @@ export function ServerConfigForm({ config }: { config: ServerConfig }) {
           <Input name="serverName" defaultValue={config.serverName} required />
         </label>
         <label className={fieldClass}>
-          Servidor de jogo (wss://…)
-          <Input name="gameServerUrl" defaultValue={config.gameServerUrl} placeholder="vazio = ainda não existe" />
+          Servidor de jogo (ws:// ou wss://)
+          <Input name="gameServerUrl" defaultValue={config.gameServerUrl} placeholder="vazio = o que o servidor anunciar" />
         </label>
         <label className={fieldClass}>
           Versão mínima do app
@@ -103,6 +105,31 @@ export function BanButton({ accountId, banned, name }: { accountId: number; bann
       <Button type="submit" variant={banned ? "outline" : "ghost"} size="sm" disabled={pending}>
         {banned ? <ShieldCheck className="size-4" /> : <Ban className="size-4" />}
         {banned ? "Desbloquear" : "Bloquear"}
+      </Button>
+    </form>
+  );
+}
+
+const initialKey: ServerKeyActionState = { error: null, key: null };
+
+/** Gera a chave que o servidor de jogo manda no header X-Server-Key. Aparece uma vez só. */
+export function ServerKeyForm({ hasKey }: { hasKey: boolean }) {
+  const [state, formAction, pending] = useActionState(rotateServerKeyAction, initialKey);
+  useActionToast({ pending, error: state.error, successMessage: "Chave gerada. Copie agora." });
+  return (
+    <form action={formAction} className="space-y-2">
+      {state.key ? (
+        <label className={fieldClass}>
+          Chave do servidor de jogo (copie agora, ela não aparece de novo)
+          <Input readOnly value={state.key} className="font-mono" onFocus={(e) => e.currentTarget.select()} />
+          <span className="text-xs">
+            Salve no PC do servidor em <code>server_key.txt</code> (pasta do jogo) ou na variável <code>VENORE_SERVER_KEY</code>.
+          </span>
+        </label>
+      ) : null}
+      <Button type="submit" variant={hasKey ? "outline" : "default"} disabled={pending}>
+        <KeyRound className="size-4" />
+        {hasKey ? "Gerar nova chave (a atual para de funcionar)" : "Gerar chave do servidor"}
       </Button>
     </form>
   );

@@ -7,6 +7,11 @@ export async function selectAccountByNameKey(nameKey: string) {
   return row ?? null;
 }
 
+export async function selectAccountById(accountId: number) {
+  const [row] = await db.select({ id: accounts.id, name: accounts.name }).from(accounts).where(eq(accounts.id, accountId)).limit(1);
+  return row ?? null;
+}
+
 export async function insertAccount(input: { name: string; nameKey: string; passwordHash: string }) {
   const [row] = await db.insert(accounts).values(input).onConflictDoNothing().returning();
   return row ?? null;

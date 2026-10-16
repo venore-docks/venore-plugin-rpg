@@ -5,6 +5,7 @@ import { isPluginActive } from "@venore/plugin-sdk";
 import {
   deleteContentEntry,
   publishContent,
+  rotateServerKey,
   saveContentEntry,
   setAccountBanned,
   updateServerConfig,
@@ -102,4 +103,14 @@ export async function setBannedAction(_prev: RpgActionState, formData: FormData)
   if (!result.success) return { error: result.error.message };
   revalidatePath("/admin/rpg/accounts");
   return { error: null };
+}
+
+export type ServerKeyActionState = { error: string | null; key: string | null };
+
+export async function rotateServerKeyAction(_prev: ServerKeyActionState, _formData: FormData): Promise<ServerKeyActionState> {
+  if (!(await isPluginActive("rpg"))) return { error: DISABLED, key: null };
+  const result = await rotateServerKey();
+  if (!result.success) return { error: result.error.message, key: null };
+  revalidatePath("/admin/rpg");
+  return { error: null, key: result.data.key };
 }

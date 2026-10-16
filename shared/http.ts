@@ -16,6 +16,8 @@ const ERROR_STATUS: Record<string, number> = {
   "rpg.client_outdated": 426,
   "rpg.name_taken": 409,
   "rpg.not_found": 404,
+  "rpg.invalid_server_key": 401,
+  "rpg.too_many_characters": 409,
 };
 
 /** Converte um erro de service (code namespaced) em resposta HTTP. */

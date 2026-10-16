@@ -10,6 +10,7 @@ import {
   insertAccount,
   insertCharacter,
   insertSession,
+  selectAccountById,
   selectAccountByNameKey,
   selectAccounts,
   selectCharactersOf,
@@ -75,6 +76,19 @@ export async function resolveSession(token: string): Promise<OperationResult<{ a
     return { success: false, error: { code: "rpg.invalid_session", message: "Sessão expirada. Entre de novo." } };
   }
   return { success: true, data: { accountId: session.accountId } };
+}
+
+/** App já logado (token guardado no celular): conta e personagens, sem pedir a senha de novo. */
+export async function listMyCharacters(command: { token: string }): Promise<OperationResult<{ account: { id: number; name: string }; characters: CharacterSummary[] }>> {
+  const session = await resolveSession(command.token);
+  if (!session.success) return session;
+  const account = await selectAccountById(session.data.accountId);
+  if (!account) return { success: false, error: { code: "rpg.invalid_session", message: "Sessão expirada. Entre de novo." } };
+  const chars = await selectCharactersOf([account.id]);
+  return {
+    success: true,
+    data: { account: { id: account.id, name: account.name }, characters: chars.map(({ id, name, level }) => ({ id, name, level })) },
+  };
 }
 
 export async function createCharacter(command: { token: string; name: string }): Promise<OperationResult<CharacterSummary>> {

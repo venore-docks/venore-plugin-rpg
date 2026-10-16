@@ -62,3 +62,26 @@ export type LoginResponse = {
   account: { id: number; name: string };
   characters: CharacterSummary[];
 };
+
+/** Entrada de um jogador no servidor de jogo: conta + personagem com o último estado gravado. */
+export type GameSession = {
+  account: { id: number; name: string };
+  character: { id: number; name: string; level: number; save: Record<string, unknown> | null };
+};
+
+/** Estado de um personagem enviado pelo servidor de jogo (save = JSON do jogo, opaco para o site). */
+export type CharacterSaveInput = { id: number; level: number; save: Record<string, unknown> };
+
+/** Batimento do servidor de jogo (a cada ~30 s enquanto está no ar). */
+export type ServerHeartbeat = { players: string[]; serverVersion: string; contentVersion: string; publicUrl: string };
+
+export type GameServerStatus = {
+  online: boolean;
+  lastSeenAt: string | null;
+  players: string[];
+  serverVersion: string | null;
+  contentVersion: string | null;
+  keyCreatedAt: string | null;
+  /** Endereço que o próprio servidor de jogo anunciou (ex.: túnel que muda a cada reinício). */
+  publicUrl: string | null;
+};
