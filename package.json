@@ -1,0 +1,24 @@
+{
+  "name": "@venore/plugin-rpg",
+  "version": "0.1.0",
+  "description": "Servidor de conteúdo e contas do MMORPG Venore: itens, monstros, NPCs e regras editáveis no admin, publicação versionada, contas/login e API para o app.",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./manifest": "./manifest.ts",
+    "./route-table": "./routes/route-table.ts",
+    "./contributions": "./contributions.ts",
+    "./migrations/*": "./migrations/*",
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "drizzle-orm": ">=0.45",
+    "next": ">=16",
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.0"
+  }
+}
